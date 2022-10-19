@@ -45,7 +45,8 @@ class Tabs {
 
   static List<Tabs> allTabs = [
     Tabs(tabIndex: 0, tabName: "Type"),
-    Tabs(tabIndex: 1, tabName: "Draw in Package 1"),
-    Tabs(tabIndex: 2, tabName: "Draw in Package 2"),
+    Tabs(tabIndex: 1, tabName: "Draw 1"),
+    Tabs(tabIndex: 2, tabName: "Draw 2"),
+    Tabs(tabIndex: 3, tabName: "Upload"),
   ];
 }

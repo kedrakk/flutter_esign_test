@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:image_cropper/image_cropper.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:signature/signature.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import 'package:test_esign/model.dart';
@@ -22,10 +26,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   late SignatureController _controller;
   final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey();
   late TabController tabController;
+  final ImagePicker _picker = ImagePicker();
+  File? fileImage;
 
   @override
   void initState() {
-    tabController = TabController(length: 3, vsync: this);
+    tabController = TabController(length: 4, vsync: this);
     _controller = SignatureController(
       penStrokeWidth: 3,
       penColor: Colors.black,
@@ -119,6 +125,22 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     strokeColor: Colors.black,
                     backgroundColor: Colors.transparent,
                   ),
+                  GestureDetector(
+                    onTap: () => _uploadImage(),
+                    child: fileImage != null
+                        ? Container(
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: FileImage(
+                                  fileImage!,
+                                ),
+                              ),
+                            ),
+                          )
+                        : const Icon(
+                            Icons.upload_file,
+                          ),
+                  )
                 ],
               ),
             ),
@@ -136,6 +158,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                     if (_signaturePadKey.currentState != null) {
                       _signaturePadKey.currentState!.clear();
                     }
+                    if (fileImage != null) {
+                      fileImage = null;
+                    }
+                    setState(() {});
                   },
                   child: const Text("Clear"),
                 ),
@@ -153,13 +179,75 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
     );
   }
 
+  _uploadImage() async {
+    final XFile? image = await _picker.pickImage(
+      source: ImageSource.gallery,
+    );
+    if (image != null) {
+      _cropImage(File(image.path));
+    }
+  }
+
+  _cropImage(File file) async {
+    CroppedFile? croppedFile = await ImageCropper().cropImage(
+      sourcePath: file.path,
+      aspectRatioPresets: [
+        CropAspectRatioPreset.square,
+        CropAspectRatioPreset.ratio3x2,
+        CropAspectRatioPreset.original,
+        CropAspectRatioPreset.ratio4x3,
+        CropAspectRatioPreset.ratio16x9
+      ],
+      uiSettings: [
+        AndroidUiSettings(
+            toolbarTitle: 'Cropper',
+            toolbarColor: Colors.deepOrange,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.original,
+            lockAspectRatio: false),
+        IOSUiSettings(
+          title: 'Cropper',
+        ),
+        WebUiSettings(
+          context: context,
+        ),
+      ],
+    );
+    if (croppedFile != null) {
+      setState(() {
+        fileImage = File(croppedFile.path);
+      });
+      _showUploadImage();
+    }
+  }
+
   _getImage() {
     if (tabController.index == 0) {
       _showTextImage();
     } else if (tabController.index == 1) {
       _showSvgImage();
-    } else {
+    } else if (tabController.index == 2) {
       _showPadImage();
+    } else {
+      _showUploadImage();
+    }
+  }
+
+  _showUploadImage() {
+    if (fileImage != null) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: SizedBox(
+              height: 300,
+              child: Image.file(
+                fileImage!,
+              ),
+            ),
+          );
+        },
+      );
     }
   }
 
@@ -168,13 +256,16 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       context: context,
       builder: (context) {
         return AlertDialog(
-          content: Text(
-            textEditingController.text,
-            style: TextAndStyle.allStyles
-                .firstWhere(
-                  (element) => element.isSelected,
-                )
-                .fontStyle,
+          content: SizedBox(
+            height: 300,
+            child: Text(
+              textEditingController.text,
+              style: TextAndStyle.allStyles
+                  .firstWhere(
+                    (element) => element.isSelected,
+                  )
+                  .fontStyle,
+            ),
           ),
         );
       },
@@ -187,7 +278,10 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         context: context,
         builder: (context) {
           return AlertDialog(
-            content: SvgPicture.string(_controller.toRawSVG()!),
+            content: SizedBox(
+              height: 300,
+              child: SvgPicture.string(_controller.toRawSVG()!),
+            ),
           );
         },
       );
@@ -204,9 +298,12 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         showDialog(
           context: context,
           builder: (context) {
-            return AlertDialog(
-              content: Image.memory(
-                uint8list,
+            return SizedBox(
+              height: 300,
+              child: AlertDialog(
+                content: Image.memory(
+                  uint8list,
+                ),
               ),
             );
           },
