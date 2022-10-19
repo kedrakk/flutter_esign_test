@@ -55,6 +55,9 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       appBar: AppBar(
         title: Text(widget.title),
         bottom: TabBar(
+          labelPadding: const EdgeInsets.symmetric(
+            vertical: 10,
+          ),
           controller: tabController,
           tabs: Tabs.allTabs.map((e) => Text(e.tabName)).toList(),
         ),
@@ -76,39 +79,41 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 children: [
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: TextFormField(
-                      controller: textEditingController,
-                      style: TextAndStyle.allStyles
-                          .firstWhere(
-                            (element) => element.isSelected,
-                          )
-                          .fontStyle,
-                      decoration: InputDecoration(
-                        suffixIcon: PopupMenuButton(
-                          icon: const Icon(Icons.font_download),
-                          itemBuilder: (BuildContext context) {
-                            return TextAndStyle.allStyles
-                                .map(
-                                  (e) => PopupMenuItem(
-                                    child: Text(
-                                      e.textName,
-                                      style: e.fontStyle,
+                    child: Center(
+                      child: TextFormField(
+                        controller: textEditingController,
+                        style: TextAndStyle.allStyles
+                            .firstWhere(
+                              (element) => element.isSelected,
+                            )
+                            .fontStyle,
+                        decoration: InputDecoration(
+                          suffixIcon: PopupMenuButton(
+                            icon: const Icon(Icons.font_download),
+                            itemBuilder: (BuildContext context) {
+                              return TextAndStyle.allStyles
+                                  .map(
+                                    (e) => PopupMenuItem(
+                                      child: Text(
+                                        e.textName,
+                                        style: e.fontStyle,
+                                      ),
+                                      onTap: () {
+                                        if (!e.isSelected) {
+                                          TextAndStyle.allStyles
+                                              .firstWhere(
+                                                (element) => element.isSelected,
+                                              )
+                                              .isSelected = false;
+                                          e.isSelected = true;
+                                          setState(() {});
+                                        }
+                                      },
                                     ),
-                                    onTap: () {
-                                      if (!e.isSelected) {
-                                        TextAndStyle.allStyles
-                                            .firstWhere(
-                                              (element) => element.isSelected,
-                                            )
-                                            .isSelected = false;
-                                        e.isSelected = true;
-                                        setState(() {});
-                                      }
-                                    },
-                                  ),
-                                )
-                                .toList();
-                          },
+                                  )
+                                  .toList();
+                            },
+                          ),
                         ),
                       ),
                     ),
@@ -258,13 +263,15 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
         return AlertDialog(
           content: SizedBox(
             height: 300,
-            child: Text(
-              textEditingController.text,
-              style: TextAndStyle.allStyles
-                  .firstWhere(
-                    (element) => element.isSelected,
-                  )
-                  .fontStyle,
+            child: Center(
+              child: Text(
+                textEditingController.text,
+                style: TextAndStyle.allStyles
+                    .firstWhere(
+                      (element) => element.isSelected,
+                    )
+                    .fontStyle,
+              ),
             ),
           ),
         );
