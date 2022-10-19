@@ -1,27 +1,35 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:signature/signature.dart';
+import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import 'package:test_esign/model.dart';
+import 'dart:ui' as ui;
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key, required this.title});
+class HomePage extends StatefulWidget {
+  const HomePage({
+    super.key,
+    required this.title,
+  });
   final String title;
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  State<HomePage> createState() => _HomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  late SignatureController _controller;
-  int _index = 0;
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   final TextEditingController textEditingController = TextEditingController();
+  late SignatureController _controller;
+  final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey();
+  late TabController tabController;
 
   @override
   void initState() {
+    tabController = TabController(length: 3, vsync: this);
     _controller = SignatureController(
-      penStrokeWidth: 5,
-      penColor: Colors.red,
-      exportBackgroundColor: Colors.blue,
+      penStrokeWidth: 3,
+      penColor: Colors.black,
+      exportBackgroundColor: Colors.white,
     );
     _controller.addListener(() {
       debugPrint(_controller.toString());
@@ -35,145 +43,105 @@ class _MyHomePageState extends State<MyHomePage> {
     super.dispose();
   }
 
-  _showImage() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return _index == 1
-            ? AlertDialog(
-                content: _controller.isNotEmpty
-                    ? SvgPicture.string(_controller.toRawSVG()!)
-                    : const Text("No Image"),
-              )
-            : AlertDialog(
-                content: SizedBox(
-                  height: 300,
-                  child: Center(
-                    child: Text(
-                      textEditingController.text,
-                      style: TextAndStyle.allStyles
-                          .firstWhere(
-                            (element) => element.isSelected,
-                          )
-                          .fontStyle,
-                    ),
-                  ),
-                ),
-              );
-      },
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.title),
+        bottom: TabBar(
+          controller: tabController,
+          tabs: Tabs.allTabs.map((e) => Text(e.tabName)).toList(),
+        ),
       ),
-      body: Center(
+      body: Padding(
+        padding: const EdgeInsets.all(10.0),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Padding(
-              padding: const EdgeInsets.symmetric(
-                vertical: 10,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                border: Border.all(
+                  color: Colors.grey,
+                ),
               ),
-              child: Row(
+              height: 300,
+              child: TabBarView(
+                physics: const NeverScrollableScrollPhysics(),
+                controller: tabController,
                 children: [
-                  TextButton(
-                    child: const Text("Type"),
-                    onPressed: () {
-                      if (_index == 1) {
-                        setState(() {
-                          _index = 0;
-                        });
-                        if (_controller.isNotEmpty) {
-                          _controller.clear();
-                        }
-                      }
-                    },
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: TextFormField(
+                      controller: textEditingController,
+                      style: TextAndStyle.allStyles
+                          .firstWhere(
+                            (element) => element.isSelected,
+                          )
+                          .fontStyle,
+                      decoration: InputDecoration(
+                        suffixIcon: PopupMenuButton(
+                          icon: const Icon(Icons.font_download),
+                          itemBuilder: (BuildContext context) {
+                            return TextAndStyle.allStyles
+                                .map(
+                                  (e) => PopupMenuItem(
+                                    child: Text(
+                                      e.textName,
+                                      style: e.fontStyle,
+                                    ),
+                                    onTap: () {
+                                      if (!e.isSelected) {
+                                        TextAndStyle.allStyles
+                                            .firstWhere(
+                                              (element) => element.isSelected,
+                                            )
+                                            .isSelected = false;
+                                        e.isSelected = true;
+                                        setState(() {});
+                                      }
+                                    },
+                                  ),
+                                )
+                                .toList();
+                          },
+                        ),
+                      ),
+                    ),
                   ),
-                  TextButton(
-                    child: const Text("Draw"),
-                    onPressed: () {
-                      if (_index == 0) {
-                        setState(() {
-                          _index = 1;
-                        });
-                      }
-                    },
+                  Signature(
+                    controller: _controller,
+                    height: double.infinity,
+                    backgroundColor: Colors.lightBlueAccent,
+                  ),
+                  SfSignaturePad(
+                    key: _signaturePadKey,
+                    minimumStrokeWidth: 1,
+                    maximumStrokeWidth: 3,
+                    strokeColor: Colors.black,
+                    backgroundColor: Colors.transparent,
                   ),
                 ],
               ),
             ),
-            _index == 0
-                ? SizedBox(
-                    height: 300,
-                    child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                      child: TextFormField(
-                        controller: textEditingController,
-                        style: TextAndStyle.allStyles
-                            .firstWhere(
-                              (element) => element.isSelected,
-                            )
-                            .fontStyle,
-                        decoration: InputDecoration(
-                          suffixIcon: PopupMenuButton(
-                            icon: const Icon(Icons.font_download),
-                            itemBuilder: (BuildContext context) {
-                              return TextAndStyle.allStyles
-                                  .map(
-                                    (e) => PopupMenuItem(
-                                      child: Text(
-                                        e.textName,
-                                        style: e.fontStyle,
-                                      ),
-                                      onTap: () {
-                                        if (!e.isSelected) {
-                                          TextAndStyle.allStyles
-                                              .firstWhere(
-                                                (element) => element.isSelected,
-                                              )
-                                              .isSelected = false;
-                                          e.isSelected = true;
-                                          setState(() {});
-                                        }
-                                      },
-                                    ),
-                                  )
-                                  .toList();
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                  )
-                : Signature(
-                    controller: _controller,
-                    height: 300,
-                    backgroundColor: Colors.lightBlueAccent,
-                  ),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
                 ElevatedButton(
                   onPressed: () {
+                    if (textEditingController.text.isNotEmpty) {
+                      textEditingController.clear();
+                    }
                     if (_controller.isNotEmpty) {
                       _controller.clear();
                     }
-                    if (textEditingController.text.isNotEmpty) {
-                      textEditingController.clear();
+                    if (_signaturePadKey.currentState != null) {
+                      _signaturePadKey.currentState!.clear();
                     }
                   },
                   child: const Text("Clear"),
                 ),
                 ElevatedButton(
                   onPressed: () {
-                    if (_controller.isNotEmpty ||
-                        textEditingController.text.isNotEmpty) {
-                      _showImage();
-                    }
+                    _getImage();
                   },
                   child: const Text("Select"),
                 ),
@@ -183,5 +151,67 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
     );
+  }
+
+  _getImage() {
+    if (tabController.index == 0) {
+      _showTextImage();
+    } else if (tabController.index == 1) {
+      _showSvgImage();
+    } else {
+      _showPadImage();
+    }
+  }
+
+  _showTextImage() {
+    showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          content: Text(
+            textEditingController.text,
+            style: TextAndStyle.allStyles
+                .firstWhere(
+                  (element) => element.isSelected,
+                )
+                .fontStyle,
+          ),
+        );
+      },
+    );
+  }
+
+  _showSvgImage() {
+    if (_controller.isNotEmpty) {
+      showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            content: SvgPicture.string(_controller.toRawSVG()!),
+          );
+        },
+      );
+    }
+  }
+
+  _showPadImage() async {
+    if (_signaturePadKey.currentState != null) {
+      ui.Image image = await _signaturePadKey.currentState!.toImage();
+      ByteData? byteData =
+          await image.toByteData(format: ui.ImageByteFormat.png);
+      if (byteData != null) {
+        Uint8List uint8list = Uint8List.view(byteData.buffer);
+        showDialog(
+          context: context,
+          builder: (context) {
+            return AlertDialog(
+              content: Image.memory(
+                uint8list,
+              ),
+            );
+          },
+        );
+      }
+    }
   }
 }

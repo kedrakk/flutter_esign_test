@@ -34,3 +34,18 @@ class TextAndStyle {
     ),
   ];
 }
+
+class Tabs {
+  String tabName;
+  int tabIndex;
+  Tabs({
+    required this.tabIndex,
+    required this.tabName,
+  });
+
+  static List<Tabs> allTabs = [
+    Tabs(tabIndex: 0, tabName: "Type"),
+    Tabs(tabIndex: 1, tabName: "Draw in Package 1"),
+    Tabs(tabIndex: 2, tabName: "Draw in Package 2"),
+  ];
+}
