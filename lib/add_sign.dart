@@ -1,11 +1,8 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:flutter_svg/svg.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:signature/signature.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import 'package:test_esign/model.dart';
 import 'dart:ui' as ui;
@@ -22,8 +19,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
-  final TextEditingController textEditingController = TextEditingController();
-  late SignatureController _controller;
   final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey();
   late TabController tabController;
   final ImagePicker _picker = ImagePicker();
@@ -31,22 +26,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   @override
   void initState() {
-    tabController = TabController(length: 4, vsync: this);
-    _controller = SignatureController(
-      penStrokeWidth: 3,
-      penColor: Colors.black,
-      exportBackgroundColor: Colors.white,
-    );
-    _controller.addListener(() {
-      debugPrint(_controller.toString());
-    });
+    tabController = TabController(length: 2, vsync: this);
     super.initState();
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
   }
 
   @override
@@ -77,52 +58,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
                 physics: const NeverScrollableScrollPhysics(),
                 controller: tabController,
                 children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: Center(
-                      child: TextFormField(
-                        controller: textEditingController,
-                        style: TextAndStyle.allStyles
-                            .firstWhere(
-                              (element) => element.isSelected,
-                            )
-                            .fontStyle,
-                        decoration: InputDecoration(
-                          suffixIcon: PopupMenuButton(
-                            icon: const Icon(Icons.font_download),
-                            itemBuilder: (BuildContext context) {
-                              return TextAndStyle.allStyles
-                                  .map(
-                                    (e) => PopupMenuItem(
-                                      child: Text(
-                                        e.textName,
-                                        style: e.fontStyle,
-                                      ),
-                                      onTap: () {
-                                        if (!e.isSelected) {
-                                          TextAndStyle.allStyles
-                                              .firstWhere(
-                                                (element) => element.isSelected,
-                                              )
-                                              .isSelected = false;
-                                          e.isSelected = true;
-                                          setState(() {});
-                                        }
-                                      },
-                                    ),
-                                  )
-                                  .toList();
-                            },
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Signature(
-                    controller: _controller,
-                    height: double.infinity,
-                    backgroundColor: Colors.lightBlueAccent,
-                  ),
                   SfSignaturePad(
                     key: _signaturePadKey,
                     minimumStrokeWidth: 1,
@@ -154,12 +89,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               children: [
                 ElevatedButton(
                   onPressed: () {
-                    if (textEditingController.text.isNotEmpty) {
-                      textEditingController.clear();
-                    }
-                    if (_controller.isNotEmpty) {
-                      _controller.clear();
-                    }
                     if (_signaturePadKey.currentState != null) {
                       _signaturePadKey.currentState!.clear();
                     }
@@ -228,10 +157,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   _getImage() {
     if (tabController.index == 0) {
-      _showTextImage();
-    } else if (tabController.index == 1) {
-      _showSvgImage();
-    } else if (tabController.index == 2) {
       _showPadImage();
     } else {
       _showUploadImage();
@@ -249,45 +174,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
               child: Image.file(
                 fileImage!,
               ),
-            ),
-          );
-        },
-      );
-    }
-  }
-
-  _showTextImage() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          content: SizedBox(
-            height: 300,
-            child: Center(
-              child: Text(
-                textEditingController.text,
-                style: TextAndStyle.allStyles
-                    .firstWhere(
-                      (element) => element.isSelected,
-                    )
-                    .fontStyle,
-              ),
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  _showSvgImage() {
-    if (_controller.isNotEmpty) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: SizedBox(
-              height: 300,
-              child: SvgPicture.string(_controller.toRawSVG()!),
             ),
           );
         },
