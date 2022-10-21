@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
 import 'package:test_esign/sf_helper.dart';
@@ -45,24 +46,14 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
             )
           : Stack(
               children: [
-                Container(
-                  // width: MediaQuery.of(context).size.width,
-                  // height: MediaQuery.of(context).size.height * 1 / 2,
-                  child: SfPdfViewer.file(
-                    pdfFile!,
-                    onPageChanged: (page) {
-                      pdfPageIndex = page.newPageNumber - 1;
-                      setState(() {});
-                    },
-                    enableDoubleTapZooming: false,
-                    onDocumentLoaded: (details) {
-                      debugPrint(details.toString());
-                    },
-                    onZoomLevelChanged: (details) {
-                      debugPrint(details.toString());
-                    },
-                    pageLayoutMode: PdfPageLayoutMode.single,
-                  ),
+                SfPdfViewer.file(
+                  pdfFile!,
+                  onPageChanged: (page) {
+                    pdfPageIndex = page.newPageNumber - 1;
+                    setState(() {});
+                  },
+                  enableDoubleTapZooming: false,
+                  pageLayoutMode: PdfPageLayoutMode.single,
                 ),
                 Positioned(
                   top: _offset.dy - 100,
@@ -181,12 +172,23 @@ class PDFViewerWidget extends StatelessWidget {
           "View File",
         ),
       ),
-      // body: SfPdfViewer.network(
-      //   "https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf",
-      // ),
       body: SfPdfViewer.memory(
         pdfFile,
       ),
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.save),
+        onPressed: () async {
+          _storeFile();
+          Navigator.pop(context);
+        },
+      ),
     );
+  }
+
+  _storeFile() async {
+    var path = await getExternalStorageDirectory();
+    var name = DateTime.now().millisecondsSinceEpoch.toString();
+    File file = File("${path!.path}/$name.pdf");
+    await file.writeAsBytes(pdfFile);
   }
 }
