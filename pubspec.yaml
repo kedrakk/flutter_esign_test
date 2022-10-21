@@ -39,6 +39,10 @@ dependencies:
   syncfusion_flutter_signaturepad: ^20.3.50
   image_picker: ^0.8.6
   image_cropper: ^3.0.0
+  syncfusion_flutter_pdf: ^20.3.50
+  syncfusion_flutter_pdfviewer: ^20.3.50
+  file_picker: ^5.2.1
+  shared_preferences: ^2.0.15
 
 dev_dependencies:
   flutter_test:

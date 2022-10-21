@@ -1,27 +1,27 @@
 import 'dart:io';
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
 import 'package:test_esign/model.dart';
 import 'dart:ui' as ui;
 
-class HomePage extends StatefulWidget {
-  const HomePage({
+import 'package:test_esign/sf_helper.dart';
+
+class AddSign extends StatefulWidget {
+  const AddSign({
     super.key,
-    required this.title,
   });
-  final String title;
 
   @override
-  State<HomePage> createState() => _HomePageState();
+  State<AddSign> createState() => _AddSignState();
 }
 
-class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
+class _AddSignState extends State<AddSign> with TickerProviderStateMixin {
   final GlobalKey<SfSignaturePadState> _signaturePadKey = GlobalKey();
   late TabController tabController;
-  final ImagePicker _picker = ImagePicker();
+  // final ImagePicker _picker = ImagePicker();
   File? fileImage;
 
   @override
@@ -34,7 +34,7 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.title),
+        title: const Text("Add or Edit Sign"),
         bottom: TabBar(
           labelPadding: const EdgeInsets.symmetric(
             vertical: 10,
@@ -114,13 +114,20 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
   }
 
   _uploadImage() async {
-    final XFile? image = await _picker.pickImage(
-      source: ImageSource.gallery,
-    );
-    if (image != null) {
-      _cropImage(File(image.path));
+    FilePickerResult? result = await FilePicker.platform.pickFiles();
+    if (result != null) {
+      _cropImage(File(result.files.single.path!));
     }
   }
+
+  // _uploadImage1() async {
+  //   final XFile? image = await _picker.pickImage(
+  //     source: ImageSource.gallery,
+  //   );
+  //   if (image != null) {
+  //     _cropImage(File(image.path));
+  //   }
+  // }
 
   _cropImage(File file) async {
     CroppedFile? croppedFile = await ImageCropper().cropImage(
@@ -151,7 +158,6 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
       setState(() {
         fileImage = File(croppedFile.path);
       });
-      _showUploadImage();
     }
   }
 
@@ -165,19 +171,8 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   _showUploadImage() {
     if (fileImage != null) {
-      showDialog(
-        context: context,
-        builder: (context) {
-          return AlertDialog(
-            content: SizedBox(
-              height: 300,
-              child: Image.file(
-                fileImage!,
-              ),
-            ),
-          );
-        },
-      );
+      Uint8List bytes = fileImage!.readAsBytesSync();
+      _showMemoryImage(bytes);
     }
   }
 
@@ -188,20 +183,41 @@ class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
           await image.toByteData(format: ui.ImageByteFormat.png);
       if (byteData != null) {
         Uint8List uint8list = Uint8List.view(byteData.buffer);
-        showDialog(
-          context: context,
-          builder: (context) {
-            return SizedBox(
-              height: 300,
-              child: AlertDialog(
-                content: Image.memory(
-                  uint8list,
-                ),
-              ),
-            );
-          },
-        );
+        _showMemoryImage(uint8list);
       }
     }
+  }
+
+  _showMemoryImage(Uint8List uint8list) async {
+    await SFHelper.setString(
+      SFHelper.signImage,
+      StringHelper.convertUint8ListToString(
+        uint8list,
+      ),
+    );
+    showDialog(
+      context: context,
+      builder: (context) {
+        return SizedBox(
+          height: 300,
+          child: AlertDialog(
+            content: Image.memory(
+              uint8list,
+            ),
+            actions: [
+              ElevatedButton(
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.pop(context);
+                },
+                child: const Text(
+                  "Back",
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
   }
 }
