@@ -179,7 +179,22 @@ class PDFViewerWidget extends StatelessWidget {
         child: const Icon(Icons.save),
         onPressed: () async {
           _storeFile();
-          Navigator.pop(context);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: const Text(
+                "Save Success",
+              ),
+              duration: const Duration(
+                seconds: 3,
+              ),
+              action: SnackBarAction(
+                label: "OK",
+                onPressed: () {
+                  Navigator.pop(context);
+                },
+              ),
+            ),
+          );
         },
       ),
     );
