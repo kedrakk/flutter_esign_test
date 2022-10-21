@@ -46,12 +46,8 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
           : Stack(
               children: [
                 Container(
-                  decoration: BoxDecoration(
-                    color: Colors.amber,
-                    border: Border.all(
-                      color: Colors.blue,
-                    ),
-                  ),
+                  // width: MediaQuery.of(context).size.width,
+                  // height: MediaQuery.of(context).size.height * 1 / 2,
                   child: SfPdfViewer.file(
                     pdfFile!,
                     onPageChanged: (page) {
@@ -136,9 +132,9 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
       PdfBitmap(widget.signImage),
       Rect.fromLTWH(
         _offset.dx,
-        _offset.dy - 250,
-        150,
-        150,
+        _offset.dy - 100,
+        100,
+        100,
       ),
     );
     await pdfFile!.writeAsBytes(await document.save());
