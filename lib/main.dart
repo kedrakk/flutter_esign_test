@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:test_esign/start.dart';
+import 'package:test_esign/flow_2/start_one.dart';
 
 void main() {
   runApp(const MyApp());
@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const StartPage(title: 'Flutter Demo Home Page'),
+      home: const StartOnePage(title: 'Flutter Demo Home Page'),
     );
   }
 }

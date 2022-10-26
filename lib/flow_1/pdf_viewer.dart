@@ -6,7 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:syncfusion_flutter_pdf/pdf.dart';
 import 'package:syncfusion_flutter_pdfviewer/pdfviewer.dart';
-import 'package:test_esign/sf_helper.dart';
+import 'package:test_esign/flow_1/sf_helper.dart';
 
 class PDFViewerPage extends StatefulWidget {
   const PDFViewerPage({
@@ -23,6 +23,7 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
   File? pdfFile;
   Offset _offset = const Offset(100, 100);
   int pdfPageIndex = 0;
+  final PdfViewerController pdfViewerController = PdfViewerController();
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +49,7 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
               children: [
                 SfPdfViewer.file(
                   pdfFile!,
+                  controller: pdfViewerController,
                   onPageChanged: (page) {
                     pdfPageIndex = page.newPageNumber - 1;
                     setState(() {});
@@ -96,6 +98,8 @@ class _PDFViewerPageState extends State<PDFViewerPage> {
       floatingActionButton: pdfFile != null
           ? FloatingActionButton(
               onPressed: () {
+                debugPrint(_offset.toString());
+                debugPrint(pdfViewerController.scrollOffset.toString());
                 _modifyPDF();
               },
               child: const Icon(
@@ -175,6 +179,12 @@ class PDFViewerWidget extends StatelessWidget {
       body: SfPdfViewer.memory(
         pdfFile,
       ),
+      // body: SfPdfViewer.network(
+      //   'https://cdn.syncfusion.com/content/PDFViewer/flutter-succinctly.pdf',
+      //   onHyperlinkClicked: (PdfHyperlinkClickedDetails details) {
+      //     print(details.uri);
+      //   },
+      // ),
       floatingActionButton: FloatingActionButton(
         child: const Icon(Icons.save),
         onPressed: () async {

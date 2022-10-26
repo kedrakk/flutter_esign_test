@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_cropper/image_cropper.dart';
 import 'package:syncfusion_flutter_signaturepad/signaturepad.dart';
-import 'package:test_esign/model.dart';
+import 'package:test_esign/common/model.dart';
 import 'dart:ui' as ui;
 
-import 'package:test_esign/sf_helper.dart';
+import 'package:test_esign/flow_1/sf_helper.dart';
 
 class AddSign extends StatefulWidget {
   const AddSign({
