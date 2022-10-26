@@ -100,7 +100,8 @@ class _PDFViewerOnePageState extends State<PDFViewerOnePage> {
     final PdfPage page = document.pages[signIndex];
     Rect newRect = Rect.fromLTWH(
       signPosition.left,
-      signPosition.top - (100 - signPosition.height),
+      signPosition.top -
+          ((100 - signPosition.height) / 2 + signPosition.height),
       100,
       100,
     );

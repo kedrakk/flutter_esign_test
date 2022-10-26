@@ -32,10 +32,10 @@ class _AddSignOneWidgetState extends State<AddSignOneWidget> {
             height: 300,
             child: SfSignaturePad(
               key: _signaturePadKey,
-              minimumStrokeWidth: 1,
-              maximumStrokeWidth: 3,
-              strokeColor: Colors.black,
-              backgroundColor: Colors.white,
+              minimumStrokeWidth: 3,
+              maximumStrokeWidth: 5,
+              strokeColor: Colors.red,
+              backgroundColor: Colors.transparent,
             ),
           ),
           Row(
