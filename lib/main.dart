@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:test_esign/flow_2/start_one.dart';
+import 'package:test_esign/coachmarks/main_cm.dart';
 
 void main() {
   runApp(const MyApp());
@@ -7,15 +7,18 @@ void main() {
 
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
+  final String name = "Flutter Demo";
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: name,
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const StartOnePage(title: 'Flutter Demo Home Page'),
+      home: MainCoachMarksPage(
+        title: name,
+      ),
     );
   }
 }

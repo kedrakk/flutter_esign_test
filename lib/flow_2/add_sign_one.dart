@@ -55,6 +55,7 @@ class _AddSignOneWidgetState extends State<AddSignOneWidget> {
                   if (_signaturePadKey.currentState != null) {
                     await _selectImage();
                   }
+                  // ignore: use_build_context_synchronously
                   Navigator.of(context).pop(uint8list);
                 },
                 child: const Text("Select"),
