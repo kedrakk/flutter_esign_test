@@ -21,9 +21,6 @@ class _MainCoachMarksPageState extends State<MainCoachMarksPage> {
   String name = "Dylan";
   List<String> myactors = ["Dylan", "Cole", "Martin", "Christ", "William"];
   List<TargetFocus> targetsList = [];
-  // GlobalKey key1 = GlobalKey();
-  // GlobalKey key2 = GlobalKey();
-  // GlobalKey key3 = GlobalKey();
   late TutorialCoachMark tutorialCoachMark;
 
   _addTargets() async {
